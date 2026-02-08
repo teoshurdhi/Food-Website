@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="sq">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vlerësuesi i Freskisë së Ushqimit</title>
+
+  <style>
+    :root{
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      --bg:#0b1020; --card: rgba(255,255,255,.06);
+      --stroke: rgba(255,255,255,.12); --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --accent: rgba(99,102,241,.95);
+      --good: rgba(110,231,183,.95);
+      --warn: rgba(251,191,36,.95);
+      --bad: rgba(251,113,133,.95);
+    }
+
+    *{ box-sizing: border-box; }
+    body{
+      margin:0; color:var(--text);
+      background: radial-gradient(900px 500px at 20% 0%, rgba(99,102,241,.25), transparent 60%),
+                  radial-gradient(900px 500px at 85% 10%, rgba(34,211,238,.18), transparent 60%),
+                  linear-gradient(180deg, #050812, var(--bg));
+    }
+
+    .wrap{ max-width: 980px; margin: 0 auto; padding: 26px 16px 40px; }
+    h1{ margin:0 0 6px; font-size: 30px; letter-spacing:-.02em; }
+    .sub{ margin:0 0 16px; color:var(--muted); line-height:1.35; }
+
+    /* Pills: wrap nicely on mobile */
+    .pillRow{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-bottom: 12px;
+    }
+    .pill{
+      display:inline-block; padding: 6px 10px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--muted);
+      font-size: 12.5px;
+    }
+
+    .grid{ display:grid; grid-template-columns: 1.05fr 1fr; gap:14px; }
+
+    .card{
+      background: var(--card);
+      border:1px solid var(--stroke);
+      border-radius: 16px;
+      padding: 16px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .card h2{ margin:0 0 8px; font-size: 15px; }
+    label{ display:block; margin:10px 0 6px; font-weight:800; font-size: 13px; }
+
+    /* Make form controls mobile-friendly */
+    select,input,button{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      font-size: 16px;            /* IMPORTANT: iOS Safari avoids zoom on focus */
+      outline:none;
+      line-height: 1.2;
+    }
+
+    button{
+      cursor:pointer;
+      font-weight:900;
+      background: var(--accent);
+      border:1px solid rgba(255,255,255,.18);
+      min-height: 44px;           /* recommended tap target */
+    }
+    button:hover{ filter: brightness(1.05); }
+
+    .btnRow{ display:flex; gap:10px; margin-top: 12px; }
+    .btnSecondary{ background: rgba(255,255,255,.06); font-weight: 850; }
+
+    .row{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .note{ color: var(--muted); font-size: 13px; line-height: 1.4; margin-top: 10px; }
+    .status{ margin-top: 10px; font-size: 13px; min-height: 18px; color: var(--muted); }
+    .status.good{ color: var(--good); font-weight: 900; }
+    .status.bad{ color: var(--bad); font-weight: 900; }
+
+    .hintBox{
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.72);
+      font-size: 12.8px;
+      line-height: 1.35;
+    }
+
+    /* Result cards */
+    .resultStack{ display:flex; flex-direction:column; gap:12px; }
+    .bigBox{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      border-radius: 14px;
+      padding: 12px;
+      position: relative;
+      overflow:hidden;
+    }
+    .bigLabel{
+      font-size: 12.5px;
+      color: var(--muted);
+      margin: 0 0 6px;
+      letter-spacing: .01em;
+    }
+    .bigValue{
+      font-size: 18px;
+      font-weight: 950;
+      margin: 0;
+      line-height: 1.1;
+    }
+    .bigSub{
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.35;
+    }
+    .divider{
+      height:1px; background: rgba(255,255,255,.12);
+      margin: 10px 0;
+    }
+    .smallMono{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12.8px;
+      color: rgba(255,255,255,.82);
+      white-space: pre-wrap;
+      margin: 0;
+    }
+
+    /* Countdown chip */
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      font-size: 12.5px;
+      color: rgba(255,255,255,.86);
+      margin-top: 10px;
+      width: fit-content;
+    }
+    .dot{
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.6);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.08);
+    }
+    .chip.good .dot{ background: var(--good); box-shadow: 0 0 0 4px rgba(110,231,183,.18); }
+    .chip.warn .dot{ background: var(--warn); box-shadow: 0 0 0 4px rgba(251,191,36,.18); }
+    .chip.bad  .dot{ background: var(--bad);  box-shadow: 0 0 0 4px rgba(251,113,133,.18); }
+
+    .bigBox.good{ border-color: rgba(110,231,183,.25); }
+    .bigBox.warn{ border-color: rgba(251,191,36,.25); }
+    .bigBox.bad { border-color: rgba(251,113,133,.25); }
+
+    /* Make selects look nicer without breaking native open */
+    select{
+      appearance: none;
+      -webkit-appearance: none;
+      padding-right: 40px;
+      background-image:
+        linear-gradient(45deg, transparent 50%, rgba(255,255,255,.75) 50%),
+        linear-gradient(135deg, rgba(255,255,255,.75) 50%, transparent 50%);
+      background-position:
+        calc(100% - 18px) 55%,
+        calc(100% - 12px) 55%;
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px){
+      .wrap{ padding: 18px 12px 26px; }
+      h1{ font-size: 24px; }
+      .card{ padding: 14px; border-radius: 14px; }
+      .row{ grid-template-columns: 1fr; }
+      .btnRow{ flex-direction:column; }
+      .bigValue{ font-size: 20px; }
+
+      /* IMPORTANT FIX FOR MOBILE SELECTS:
+         iOS Safari can fail to open <select> inside backdrop-filter containers.
+         Turn off blur on small screens. */
+      .card{
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+    }
+
+    /* Extra safety: disable blur on touch devices even if wider screens */
+    @media (hover: none) and (pointer: coarse){
+      .card{
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <h1>Vlerësuesi i Freskisë së Ushqimit</h1>
+    <p class="sub">
+      Vlerësime të kujdesshme dhe konservative. Nëse produkti ka datë “përdoret deri / më e mira para”, ndiqni atë.
+      Gjithmonë hidhni ushqimin që ka erë ose pamje të keqe.
+    </p>
+
+    <div class="pillRow">
+      <span class="pill">Mirë deri = dritare cilësie</span>
+      <span class="pill">Kufiri i sigurt = konservativ</span>
+      <span class="pill">Numërim mbrapsht + ngjyra</span>
+    </div>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Hyrjet</h2>
+
+        <label for="search">Kërko ushqim</label>
+        <input id="search" placeholder="p.sh., qumësht, pulë, oriz, domate…" />
+
+        <label for="food">Ushqimi</label>
+        <select id="food"></select>
+
+        <div class="row">
+          <div>
+            <label for="storage">Ruajtja</label>
+            <select id="storage">
+              <option value="fridge">Frigorifer</option>
+              <option value="freezer">Ngrirës</option>
+              <option value="pantry">Dollap / Temperatura e dhomës</option>
+            </select>
+          </div>
+          <div>
+            <label for="opened">I hapur?</label>
+            <select id="opened">
+              <option value="no">Jo / i mbyllur</option>
+              <option value="yes">Po / i hapur</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="start">Data e fillimit</label>
+            <input id="start" type="date" />
+          </div>
+          <div>
+            <label for="startType">Data do të thotë…</label>
+            <select id="startType">
+              <option value="purchase">Data e blerjes / hapjes</option>
+              <option value="label">Data në etiketë (best-by/use-by)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="temp">Temperatura (°C)</label>
+            <input id="temp" type="number" step="0.5" placeholder="Vendoset automatikisht" />
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <div class="hintBox">
+              Këshillë: Për ushqimet e gatuara (mbetje), “data e fillimit” duhet të jetë kur u gatua/u fut në frigorifer.
+            </div>
+          </div>
+        </div>
+
+        <div class="btnRow">
+          <button id="calc">Llogarit</button>
+          <button id="reset" class="btnSecondary" type="button">Rivendos</button>
+        </div>
+
+        <div id="status" class="status"></div>
+
+        <div class="note">
+          Temperatura mund të ndryshohet; vendoset automatikisht kur ndryshon ruajtja.
+          Ngjyra e numërimit mbrapsht bazohet në <b>kufirin e sigurt</b>.
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Rezultati</h2>
+
+        <div class="resultStack">
+          <div id="urgencyCard" class="bigBox">
+            <p class="bigLabel">Numërimi mbrapsht (bazuar në kufirin e sigurt)</p>
+            <p id="countdownText" class="bigValue">—</p>
+
+            <div id="countdownChip" class="chip" style="display:none;">
+              <span class="dot"></span>
+              <span id="chipText"></span>
+            </div>
+
+            <p id="countdownExplain" class="bigSub">—</p>
+          </div>
+
+          <div class="bigBox" id="qualityCard">
+            <p class="bigLabel">Mirë deri më (cilësia më e mirë)</p>
+            <p id="goodUntil" class="bigValue">—</p>
+            <p id="goodExplain" class="bigSub">—</p>
+          </div>
+
+          <div class="bigBox" id="cutoffCard">
+            <p class="bigLabel">Kufiri i sigurt (më konservativ)</p>
+            <p id="cutoff" class="bigValue">—</p>
+            <p id="cutoffExplain" class="bigSub">—</p>
+          </div>
+
+          <div class="bigBox">
+            <p class="bigLabel">Shënime</p>
+            <p id="note" class="bigSub" style="margin:0;">—</p>
+
+            <div class="divider"></div>
+            <p class="bigLabel" style="margin-bottom:6px;">Detaje</p>
+            <p id="details" class="smallMono">Zgjidh hyrjet dhe kliko “Llogarit”.</p>
+          </div>
+        </div>
+
+        <div class="note">
+          Nuk është këshillë mjekësore. Ushqimet me rrezik të lartë (peshk, pulë, oriz i gatuar) kërkojnë kujdes shtesë.
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const DB = [
+      { cat:"Bulmet", id:"milk", name:"Qumësht", highRisk:false,
+        rules:{ fridge:{ sealed:[7,10], opened:[5,7] }, freezer:{ sealed:[90,180], opened:[90,180] }, pantry:{ sealed:[0,0], opened:[0,0] } },
+        note:"Mbaje në ≤4°C. Hidhet nëse ka erë të thartë, mpiksje, ose shije të çuditshme."
+      },
+      { cat:"Bulmet", id:"feta_cheese", name:"Djathë feta", highRisk:false,
+        rules:{ fridge:{ sealed:[7,14], opened:[5,10] }, freezer:{ sealed:[90,180], opened:[90,180] }, pantry:{ sealed:[0,0], opened:[0,0] } },
+        note:"Mbaje të mbyllur mirë dhe të ftohtë. Hidhet nëse myku përhapet ose ka erë të keqe."
+      },
+      { cat:"Bulmet", id:"eggs_shell", name:"Vezë (të papërpunuara, me lëvozhgë)", highRisk:false,
+        rules:{ fridge:{ sealed:[21,35], opened:[21,35] }, freezer:{ sealed:[0,0], opened:[0,0] }, pantry:{ sealed:[7,14], opened:[7,14] } },
+        note:"Më mirë në frigorifer. Mos i përdor nëse janë të çara ose kanë erë të fortë."
+      },
+
+      { cat:"Mish & Shpend", id:"raw_chicken", name:"Pulë e papërpunuar", highRisk:true,
+        rules:{ fridge:{ sealed:[1,2], opened:[1,2] }, freezer:{ sealed:[180,365], opened:[180,365] }, pantry:{ sealed:[0,0], opened:[0,0] } },
+        note:"Shumë e prishshme. Ruaje menjëherë në të ftohtë; shmang kontaminimin."
+      },
+      { cat:"Mish & Shpend", id:"raw_chicken_breast", name:"Gjoks pule (i papërpunuar)", highRisk:true,
+        rules:{ fridge:{ sealed:[1,2], opened:[1,2] }, freezer:{ sealed:[180,365], opened:[180,365] }, pantry:{ sealed:[0,0], opened:[0,0] } },
+        note:"Shumë e prishshme. Ruaje menjëherë në frigorifer dhe përdor dërrasë të veçantë."
+      },
+      { cat:"Mish & Shpend", id:"raw_beef", name:"Mish viçi (i papërpunuar)", highRisk:true,
+        rules:{ fridge:{ sealed:[2,4], opened:[1,2] }, freezer:{ sealed:[180,365], opened:[180,365] }, pantry:{ sealed:[0,0], opened:[0,0] } },
+        note:"Mbaje në ≤4°C. Hidhet nëse ka erë të keqe ose sipërfaqe ngjitëse/slimy."
+      },
+      { cat:"Mish & Shpend", id:"ham_deli", name:"Proshutë (e prerë / deli)", highRisk:true,
+        rules:{ fridge:{ sealed:[3,5], opened:[3,5] }, freezer:{ sealed:[30,60], opened:[30,60] }, pantry:{ sealed:[0,0], opened:[0,0] } },
+        note:"Produkt me rrezik më të lartë. Ruaje shumë ftohtë dhe përdore shpejt pas hapjes."
+      },
+
+      { cat:"Peshk/Deti", id:"raw_fish", name:"Peshk (i papërpunuar)", highRisk:true,
+        rules:{ fridge:{ sealed:[1,2], opened:[1,2] }, freezer:{ sealed:[90,180], opened:[90,180] }, pantry:{ sealed:[0,0], opened:[0,0] } },
+        note:"Shumë i prishshëm. Hidhet nëse ka erë të fortë/amoniak ose teksturë të rrëshqitshme."
+      },
+
+      { cat:"Ushqime të gatuara", id:"cooked_rice", name:"Oriz i gatuar (mbetje)", highRisk:true,
+        rules:{ fridge:{ sealed:[3,4], opened:[2,3] }, freezer:{ sealed:[60,90], opened:[60,90] }, pantry:{ sealed:[0,1], opened:[0,1] } },
+        note:"Rrezik më i lartë nëse lihet jashtë. Ftohe shpejt dhe fut në frigorifer."
+      },
+      { cat:"Ushqime të gatuara", id:"cooked_pasta", name:"Makarona të gatuara (mbetje)", highRisk:true,
+        rules:{ fridge:{ sealed:[3,4], opened:[2,3] }, freezer:{ sealed:[60,90], opened:[60,90] }, pantry:{ sealed:[0,1], opened:[0,1] } },
+        note:"Ftohe shpejt dhe ruaje në frigorifer. Hidhet nëse ka erë/shije të dyshimtë."
+      },
+
+      { cat:"Furrë/Buke", id:"bread", name:"Bukë (e prerë / loaf)", highRisk:false,
+        rules:{ pantry:{ sealed:[4,7], opened:[3,5] }, fridge:{ sealed:[4,7], opened:[3,5] }, freezer:{ sealed:[30,90], opened:[30,90] } },
+        note:"Ngrirësi e ruan më mirë. Nëse shfaqet myk, hidhe të gjithë bukën."
+      },
+
+      { cat:"Perime/Fruta", id:"tomatoes", name:"Domate", highRisk:false,
+        rules:{ fridge:{ sealed:[4,7], opened:[2,4] }, freezer:{ sealed:[60,180], opened:[60,180] }, pantry:{ sealed:[3,7], opened:[1,2] } },
+        note:"Më e shijshme në temperaturë dhome; fut në frigorifer kur është shumë e pjekur ose e prerë."
+      },
+    ];
+
+    const DEFAULT_TEMP_C = { fridge: 4, freezer: -18, pantry: 20 };
+
+    function $(id){ return document.getElementById(id); }
+    function setStatus(text, kind){
+      const el = $("status");
+      el.textContent = text || "";
+      el.className = "status" + (kind ? " " + kind : "");
+    }
+
+    function fmtDate(d){
+      const y = d.getFullYear();
+      const m = String(d.getMonth()+1).padStart(2,"0");
+      const day = String(d.getDate()).padStart(2,"0");
+      return `${y}-${m}-${day}`;
+    }
+    function addDays(dateObj, days){
+      const d = new Date(dateObj);
+      d.setDate(d.getDate() + days);
+      return d;
+    }
+
+    function getRule(item, storage, opened){
+      const key = opened ? "opened" : "sealed";
+      return item.rules?.[storage]?.[key] ?? null;
+    }
+
+    function buildOptions(list){
+      const byCat = {};
+      for (const item of list) (byCat[item.cat] ||= []).push(item);
+      const cats = Object.keys(byCat).sort((a,b)=>a.localeCompare(b));
+      $("food").innerHTML = cats.map(cat => {
+        const items = byCat[cat].sort((a,b)=>a.name.localeCompare(b.name));
+        return `<optgroup label="${cat}">${
+          items.map(i => `<option value="${i.id}">${i.name}</option>`).join("")
+        }</optgroup>`;
+      }).join("");
+
+      /* Ensure there is always a selected option after rebuild (helps some mobile browsers) */
+      if (!$("food").value) {
+        const first = $("food").querySelector("option");
+        if (first) $("food").value = first.value;
+      }
+    }
+
+    function autoFillTempForStorage(storage){
+      $("temp").value = DEFAULT_TEMP_C[storage];
+    }
+
+    function daysBetweenUTC(a, b){
+      const msPerDay = 24 * 60 * 60 * 1000;
+      const ua = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+      const ub = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+      return Math.floor((ub - ua) / msPerDay);
+    }
+
+    function urgencyFromDaysLeft(daysLeft){
+      if (daysLeft >= 3) return "good";
+      if (daysLeft >= 1) return "warn";
+      return "bad";
+    }
+
+    function setUrgencyUI(daysLeft, cutoffDate){
+      const card = $("urgencyCard");
+      const chip = $("countdownChip");
+      const chipText = $("chipText");
+      const main = $("countdownText");
+      const explain = $("countdownExplain");
+
+      const u = urgencyFromDaysLeft(daysLeft);
+
+      card.classList.remove("good","warn","bad");
+      card.classList.add(u);
+
+      chip.style.display = "inline-flex";
+      chip.classList.remove("good","warn","bad");
+      chip.classList.add(u);
+
+      if (daysLeft > 1) {
+        main.textContent = `${daysLeft} ditë të mbetura`;
+        chipText.textContent = u === "good" ? "Në rregull (për momentin)" : "Po afrohet";
+        explain.textContent = `Koha e mbetur deri te kufiri i sigurt (${fmtDate(cutoffDate)}).`;
+        return;
+      }
+      if (daysLeft === 1) {
+        main.textContent = `1 ditë e mbetur`;
+        chipText.textContent = "Përdore shpejt";
+        explain.textContent = `Kufiri i sigurt është nesër (${fmtDate(cutoffDate)}).`;
+        return;
+      }
+      if (daysLeft === 0) {
+        main.textContent = `Kufiri është sot`;
+        chipText.textContent = "Dita e fundit (konservativ)";
+        explain.textContent = `Kufiri i sigurt është sot (${fmtDate(cutoffDate)}). Kujdes.`;
+        return;
+      }
+
+      const daysPast = Math.abs(daysLeft);
+      main.textContent = `Pas kufirit me ${daysPast} ditë`;
+      chipText.textContent = "Mos e rreziko";
+      explain.textContent = `Kufiri i sigurt ishte ${fmtDate(cutoffDate)}. Nëse dyshon, hidhe.`;
+    }
+
+    function setResultUI({goodUntilText, goodExplain, cutoffText, cutoffExplain, note, details, countdown}){
+      $("goodUntil").textContent = goodUntilText;
+      $("goodExplain").textContent = goodExplain;
+      $("cutoff").textContent = cutoffText;
+      $("cutoffExplain").textContent = cutoffExplain;
+      $("note").textContent = note;
+      $("details").textContent = details;
+
+      if (!countdown){
+        $("countdownText").textContent = "—";
+        $("countdownExplain").textContent = "—";
+        $("countdownChip").style.display = "none";
+        $("urgencyCard").classList.remove("good","warn","bad");
+        return;
+      }
+      setUrgencyUI(countdown.daysLeft, countdown.cutoffDate);
+    }
+
+    function updateStorageOptions(){
+      const foodId = $("food").value;
+      const opened = $("opened").value === "yes";
+      const item = DB.find(x => x.id === foodId);
+      if (!item) return;
+
+      const storageSel = $("storage");
+
+      for (const opt of storageSel.options){
+        const storage = opt.value;
+        const rule = getRule(item, storage, opened);
+        const invalid = !rule || rule[1] === 0;
+        opt.disabled = invalid;
+      }
+
+      const currentOpt = storageSel.options[storageSel.selectedIndex];
+      if (currentOpt && currentOpt.disabled){
+        const firstEnabled = [...storageSel.options].find(o => !o.disabled);
+        if (firstEnabled){
+          storageSel.value = firstEnabled.value;
+          autoFillTempForStorage(storageSel.value);
+        }
+      }
+    }
+
+    function adjustRangeForStartType({ item, storage, opened, startType, minDays, maxDays }){
+      if (startType !== "label") return { minDays, maxDays };
+
+      if (item.id === "milk" && storage === "fridge") {
+        return opened ? { minDays: 3, maxDays: 5 } : { minDays: 5, maxDays: 7 };
+      }
+      if (item.highRisk && storage === "fridge") {
+        return { minDays: Math.min(minDays, 2), maxDays: Math.min(maxDays, 3) };
+      }
+      return { minDays, maxDays };
+    }
+
+    function estimate(){
+      const foodId = $("food").value;
+      const storage = $("storage").value;
+      const opened = $("opened").value === "yes";
+      const startStr = $("start").value;
+      const startType = $("startType").value;
+
+      const tempVal = $("temp").value.trim();
+      const tempC = tempVal === "" ? NaN : Number(tempVal);
+
+      const item = DB.find(x => x.id === foodId);
+      if (!item) throw new Error("Ushqim i panjohur.");
+      if (!startStr) throw new Error("Zgjidhni një datë fillimi.");
+
+      const start = new Date(startStr + "T00:00:00");
+      if (!Number.isFinite(start.getTime())) throw new Error("Datë e pavlefshme.");
+
+      const rule = getRule(item, storage, opened);
+      if (!rule) throw new Error("Nuk ka rregull për këtë kombinim.");
+
+      if (rule[1] === 0) {
+        setStatus("Nuk ka vlerësim të sigurt për këtë mënyrë ruajtjeje.", "bad");
+        return {
+          goodUntilText: "Nuk rekomandohet",
+          goodExplain: "Ky ushqim zakonisht nuk duhet ruajtur kështu.",
+          cutoffText: "Nuk rekomandohet",
+          cutoffExplain: "Përdor udhëzimet për frigorifer/ngrirës.",
+          note: item.note,
+          details: [
+            `Ushqimi: ${item.name} (${item.cat})`,
+            `Ruajtja: ${storage}, ${opened ? "i hapur" : "i mbyllur"}`,
+            `Data e fillimit: ${fmtDate(start)}`,
+            `Kuptimi i datës: ${startType === "purchase" ? "blerje/hapje" : "etiketë"}`,
+            ``,
+            `Nuk ka vlerësim të sigurt për këtë kombinim.`
+          ].join("\n"),
+          countdown: null
+        };
+      }
+
+      let [minDays, maxDays] = rule;
+      ({ minDays, maxDays } = adjustRangeForStartType({ item, storage, opened, startType, minDays, maxDays }));
+
+      if (item.highRisk && storage !== "freezer") {
+        minDays = Math.max(0, minDays - 1);
+        maxDays = Math.max(minDays, maxDays - 1);
+      }
+
+      const goodMinDate = addDays(start, minDays);
+      const goodMaxDate = addDays(start, maxDays);
+      const cutoffDate = addDays(start, minDays);
+
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const daysLeft = daysBetweenUTC(today, cutoffDate);
+
+      const tempInfo = Number.isFinite(tempC) ? `${tempC}°C` : "(pa temperaturë)";
+      const openingInfo = opened ? "i hapur" : "i mbyllur";
+
+      setStatus("Vlerësim i bërë ✔ (data në paketim ka përparësi nëse e keni)", "good");
+
+      return {
+        goodUntilText: `${fmtDate(goodMaxDate)}`,
+        goodExplain: `Cilësia më e mirë zakonisht është nga ${fmtDate(goodMinDate)} deri më ${fmtDate(goodMaxDate)}.`,
+        cutoffText: `${fmtDate(cutoffDate)}`,
+        cutoffExplain: `Kjo përdor fundin e hershëm të intervalit për të qenë më e kujdesshme.`,
+        note: item.note,
+        details: [
+          `Ushqimi: ${item.name} (${item.cat})`,
+          `Data e fillimit: ${fmtDate(start)}`,
+          `Kuptimi i datës: ${startType === "purchase" ? "blerje/hapje" : "etiketë"}`,
+          `Ruajtja: ${storage} (${tempInfo}), ${openingInfo}`,
+          `Rregulli (ditë): [${rule[0]}, ${rule[1]}]`,
+          `I rregulluar (ditë): [${minDays}, ${maxDays}]`,
+          `Numërimi mbrapsht përdor kufirin e sigurt.`
+        ].join("\n"),
+        countdown: { daysLeft, cutoffDate }
+      };
+    }
+
+    function resetUI(){
+      const today = new Date();
+      $("start").value = fmtDate(today);
+      $("storage").value = "fridge";
+      $("opened").value = "no";
+      $("startType").value = "purchase";
+      $("search").value = "";
+
+      buildOptions(DB);
+      autoFillTempForStorage("fridge");
+      updateStorageOptions();
+
+      setStatus("", "");
+      setResultUI({
+        goodUntilText:"—",
+        goodExplain:"—",
+        cutoffText:"—",
+        cutoffExplain:"—",
+        note:"—",
+        details:"Zgjidh hyrjet dhe kliko “Llogarit”.",
+        countdown: null
+      });
+    }
+
+    function init(){
+      resetUI();
+
+      $("storage").addEventListener("change", (e) => autoFillTempForStorage(e.target.value));
+      $("food").addEventListener("change", updateStorageOptions);
+      $("opened").addEventListener("change", updateStorageOptions);
+
+      $("search").addEventListener("input", (e) => {
+        const q = e.target.value.trim().toLowerCase();
+        const filtered = q
+          ? DB.filter(x => (x.name + " " + x.cat).toLowerCase().includes(q))
+          : DB;
+        buildOptions(filtered);
+        updateStorageOptions();
+      });
+
+      $("calc").addEventListener("click", () => {
+        try{
+          const r = estimate();
+          setResultUI(r);
+        }catch(e){
+          setStatus(e.message || String(e), "bad");
+          setResultUI({
+            goodUntilText:"—",
+            goodExplain:"Rregullo hyrjet dhe provo përsëri.",
+            cutoffText:"—",
+            cutoffExplain:"—",
+            note:"—",
+            details:"Gabim: " + (e.message || String(e)),
+            countdown: null
+          });
+        }
+      });
+
+      $("reset").addEventListener("click", resetUI);
+    }
+
+    init();
+  </script>
+</body>
+</html>
