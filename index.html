@@ -29,6 +29,25 @@
     h1{ margin:0 0 6px; font-size: 30px; letter-spacing:-.02em; }
     .sub{ margin:0 0 16px; color:var(--muted); line-height:1.35; }
 
+    /* ---------- NEW: Hero image ---------- */
+    .hero{
+      margin: 0 0 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      overflow: hidden;
+      background: rgba(255,255,255,.05);
+    }
+    .hero img{
+      display:block;
+      width:100%;
+      height: 160px;
+      object-fit: cover;
+      opacity: .92;
+    }
+    @media (max-width: 560px){
+      .hero img{ height: 130px; }
+    }
+
     /* Pills: wrap nicely on mobile */
     .pillRow{
       display:flex;
@@ -57,7 +76,6 @@
     .card h2{ margin:0 0 8px; font-size: 15px; }
     label{ display:block; margin:10px 0 6px; font-weight:800; font-size: 13px; }
 
-    /* Make form controls mobile-friendly */
     select,input,button{
       width:100%;
       padding: 12px 12px;
@@ -65,7 +83,7 @@
       border:1px solid rgba(255,255,255,.16);
       background: rgba(0,0,0,.22);
       color: var(--text);
-      font-size: 16px;            /* IMPORTANT: iOS Safari avoids zoom on focus */
+      font-size: 16px;
       outline:none;
       line-height: 1.2;
     }
@@ -75,7 +93,7 @@
       font-weight:900;
       background: var(--accent);
       border:1px solid rgba(255,255,255,.18);
-      min-height: 44px;           /* recommended tap target */
+      min-height: 44px;
     }
     button:hover{ filter: brightness(1.05); }
 
@@ -97,6 +115,50 @@
       color: rgba(255,255,255,.72);
       font-size: 12.8px;
       line-height: 1.35;
+    }
+
+    /* ---------- NEW: Food image row (left card) ---------- */
+    .foodMediaRow{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      margin: 10px 0 6px;
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+    }
+    .foodThumb{
+      width: 62px;
+      height: 62px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      overflow:hidden;
+      flex: 0 0 auto;
+    }
+    .foodThumb img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      display:block;
+    }
+    .foodMeta{
+      min-width: 0;
+    }
+    .foodTitle{
+      margin:0;
+      font-weight: 950;
+      font-size: 14px;
+      line-height: 1.2;
+    }
+    .foodCat{
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     /* Result cards */
@@ -139,6 +201,26 @@
       margin: 0;
     }
 
+    /* ---------- NEW: optional image inside result urgency card ---------- */
+    .urgencyMedia{
+      position:absolute;
+      top: 10px;
+      right: 10px;
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      overflow:hidden;
+      background: rgba(255,255,255,.06);
+      opacity: .92;
+    }
+    .urgencyMedia img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      display:block;
+    }
+
     /* Countdown chip */
     .chip{
       display:inline-flex;
@@ -168,7 +250,6 @@
     .bigBox.warn{ border-color: rgba(251,191,36,.25); }
     .bigBox.bad { border-color: rgba(251,113,133,.25); }
 
-    /* Make selects look nicer without breaking native open */
     select{
       appearance: none;
       -webkit-appearance: none;
@@ -183,7 +264,6 @@
       background-repeat: no-repeat;
     }
 
-    /* Responsive */
     @media (max-width: 900px){
       .grid{ grid-template-columns: 1fr; }
     }
@@ -196,16 +276,12 @@
       .btnRow{ flex-direction:column; }
       .bigValue{ font-size: 20px; }
 
-      /* IMPORTANT FIX FOR MOBILE SELECTS:
-         iOS Safari can fail to open <select> inside backdrop-filter containers.
-         Turn off blur on small screens. */
       .card{
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
       }
     }
 
-    /* Extra safety: disable blur on touch devices even if wider screens */
     @media (hover: none) and (pointer: coarse){
       .card{
         backdrop-filter: none !important;
@@ -218,6 +294,12 @@
 <body>
   <div class="wrap">
     <h1>Vlerësuesi i Freskisë së Ushqimit</h1>
+
+    <!-- NEW: Hero picture -->
+    <div class="hero">
+      <img id="heroImg" alt="Ushqime të freskëta" />
+    </div>
+
     <p class="sub">
       Vlerësime të kujdesshme dhe konservative. Nëse produkti ka datë “përdoret deri / më e mira para”, ndiqni atë.
       Gjithmonë hidhni ushqimin që ka erë ose pamje të keqe.
@@ -238,6 +320,17 @@
 
         <label for="food">Ushqimi</label>
         <select id="food"></select>
+
+        <!-- NEW: Food thumbnail + meta -->
+        <div class="foodMediaRow" aria-live="polite">
+          <div class="foodThumb">
+            <img id="foodImg" alt="Foto e ushqimit" />
+          </div>
+          <div class="foodMeta">
+            <p id="foodTitle" class="foodTitle">—</p>
+            <p id="foodCat" class="foodCat">—</p>
+          </div>
+        </div>
 
         <div class="row">
           <div>
@@ -302,6 +395,11 @@
 
         <div class="resultStack">
           <div id="urgencyCard" class="bigBox">
+            <!-- NEW: tiny picture on the card -->
+            <div class="urgencyMedia" aria-hidden="true">
+              <img id="urgencyImg" alt="" />
+            </div>
+
             <p class="bigLabel">Numërimi mbrapsht (bazuar në kufirin e sigurt)</p>
             <p id="countdownText" class="bigValue">—</p>
 
@@ -343,6 +441,77 @@
   </div>
 
   <script>
+    /* ---------- NEW: tiny inline images (no hosting needed) ---------- */
+    const IMG = {
+      hero: svgDataUrl(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420">
+          <defs>
+            <linearGradient id="g" x1="0" x2="1">
+              <stop offset="0" stop-color="#6366f1" stop-opacity="0.55"/>
+              <stop offset="1" stop-color="#22d3ee" stop-opacity="0.35"/>
+            </linearGradient>
+          </defs>
+          <rect width="1200" height="420" fill="#0b1020"/>
+          <rect width="1200" height="420" fill="url(#g)"/>
+          <circle cx="220" cy="220" r="140" fill="rgba(255,255,255,0.12)"/>
+          <circle cx="1020" cy="120" r="180" fill="rgba(255,255,255,0.08)"/>
+          <text x="60" y="250" fill="rgba(255,255,255,0.92)" font-family="system-ui,Segoe UI,Arial" font-size="54" font-weight="800">
+            Freskia fillon me ruajtjen
+          </text>
+          <text x="60" y="305" fill="rgba(255,255,255,0.72)" font-family="system-ui,Segoe UI,Arial" font-size="26">
+            Kontrollo datat • Ruaj ftohtë • Mos rreziko kur dyshon
+          </text>
+        </svg>
+      `),
+      fallback: coloredTile("?", "#ffffff"),
+      milk: iconMilk(),
+      feta_cheese: iconCheese(),
+      eggs_shell: iconEggs(),
+      raw_chicken: iconChicken(),
+      raw_chicken_breast: iconChicken(),
+      raw_beef: iconBeef(),
+      ham_deli: iconHam(),
+      raw_fish: iconFish(),
+      cooked_rice: iconRice(),
+      cooked_pasta: iconPasta(),
+      bread: iconBread(),
+      tomatoes: iconTomato(),
+    };
+
+    function svgDataUrl(svg){
+      return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg.trim());
+    }
+    function coloredTile(letter, color){
+      return svgDataUrl(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="140" height="140" viewBox="0 0 140 140">
+          <defs>
+            <linearGradient id="g" x1="0" x2="1">
+              <stop offset="0" stop-color="rgba(99,102,241,0.55)"/>
+              <stop offset="1" stop-color="rgba(34,211,238,0.35)"/>
+            </linearGradient>
+          </defs>
+          <rect width="140" height="140" rx="22" fill="rgba(255,255,255,0.06)"/>
+          <rect x="8" y="8" width="124" height="124" rx="18" fill="url(#g)"/>
+          <text x="70" y="84" text-anchor="middle" font-family="system-ui,Segoe UI,Arial"
+                font-size="64" font-weight="900" fill="${color}" fill-opacity="0.9">${letter}</text>
+        </svg>
+      `);
+    }
+
+    /* Simple icon set */
+    function iconMilk(){ return coloredTile("🥛", "#ffffff"); }
+    function iconCheese(){ return coloredTile("🧀", "#ffffff"); }
+    function iconEggs(){ return coloredTile("🥚", "#ffffff"); }
+    function iconChicken(){ return coloredTile("🍗", "#ffffff"); }
+    function iconBeef(){ return coloredTile("🥩", "#ffffff"); }
+    function iconHam(){ return coloredTile("🍖", "#ffffff"); }
+    function iconFish(){ return coloredTile("🐟", "#ffffff"); }
+    function iconRice(){ return coloredTile("🍚", "#ffffff"); }
+    function iconPasta(){ return coloredTile("🍝", "#ffffff"); }
+    function iconBread(){ return coloredTile("🍞", "#ffffff"); }
+    function iconTomato(){ return coloredTile("🍅", "#ffffff"); }
+
+    /* ---------- Your existing DB ---------- */
     const DB = [
       { cat:"Bulmet", id:"milk", name:"Qumësht", highRisk:false,
         rules:{ fridge:{ sealed:[7,10], opened:[5,7] }, freezer:{ sealed:[90,180], opened:[90,180] }, pantry:{ sealed:[0,0], opened:[0,0] } },
@@ -436,7 +605,6 @@
         }</optgroup>`;
       }).join("");
 
-      /* Ensure there is always a selected option after rebuild (helps some mobile browsers) */
       if (!$("food").value) {
         const first = $("food").querySelector("option");
         if (first) $("food").value = first.value;
@@ -636,6 +804,22 @@
       };
     }
 
+    /* ---------- NEW: update pictures when food changes ---------- */
+    function updateFoodMedia(){
+      const foodId = $("food").value;
+      const item = DB.find(x => x.id === foodId);
+
+      const src = (item && IMG[item.id]) ? IMG[item.id] : IMG.fallback;
+      $("foodImg").src = src;
+      $("urgencyImg").src = src;
+
+      $("foodTitle").textContent = item ? item.name : "—";
+      $("foodCat").textContent = item ? item.cat : "—";
+
+      // Better alt text for accessibility
+      $("foodImg").alt = item ? `Foto/ikonë për: ${item.name}` : "Foto e ushqimit";
+    }
+
     function resetUI(){
       const today = new Date();
       $("start").value = fmtDate(today);
@@ -647,6 +831,7 @@
       buildOptions(DB);
       autoFillTempForStorage("fridge");
       updateStorageOptions();
+      updateFoodMedia();
 
       setStatus("", "");
       setResultUI({
@@ -661,10 +846,13 @@
     }
 
     function init(){
+      // set hero image once
+      $("heroImg").src = IMG.hero;
+
       resetUI();
 
       $("storage").addEventListener("change", (e) => autoFillTempForStorage(e.target.value));
-      $("food").addEventListener("change", updateStorageOptions);
+      $("food").addEventListener("change", () => { updateStorageOptions(); updateFoodMedia(); });
       $("opened").addEventListener("change", updateStorageOptions);
 
       $("search").addEventListener("input", (e) => {
@@ -674,6 +862,7 @@
           : DB;
         buildOptions(filtered);
         updateStorageOptions();
+        updateFoodMedia();
       });
 
       $("calc").addEventListener("click", () => {
