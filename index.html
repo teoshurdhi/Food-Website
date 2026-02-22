@@ -25,30 +25,93 @@
                   linear-gradient(180deg, #050812, var(--bg));
     }
 
-    .wrap{ max-width: 980px; margin: 0 auto; padding: 26px 16px 40px; }
-    h1{ margin:0 0 6px; font-size: 30px; letter-spacing:-.02em; }
+    .wrap{ max-width: 980px; margin: 0 auto; padding: 18px 16px 40px; }
     .sub{ margin:0 0 16px; color:var(--muted); line-height:1.35; }
 
-    /* ---------- NEW: Hero image ---------- */
-    .hero{
-      margin: 0 0 14px;
+    /* ---------- Aesthetic Top Bar ---------- */
+    .topbar{
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding: 14px 0 10px;
+      background: linear-gradient(180deg, rgba(5,8,18,.92), rgba(5,8,18,.55), transparent);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .topbarInner{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 16px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .siteLogo{
+      width: 194px;
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.35));
+    }
+
+    .siteTitle{
+      margin: 0;
+      text-align: center;
+      font-size: 28px;
+      font-weight: 950;
+      letter-spacing: -0.02em;
+      text-shadow: 0 10px 22px rgba(0,0,0,.45);
+    }
+
+    .topbarSpacer{ width: 74px; }
+
+    /* ---------- Hero Card (designed, not an image) ---------- */
+    .heroCard{
+      position: relative;
+      margin: 16px 0 14px;
       border-radius: 18px;
       border: 1px solid rgba(255,255,255,.12);
       overflow: hidden;
-      background: rgba(255,255,255,.05);
-    }
-    .hero img{
-      display:block;
-      width:100%;
-      height: 160px;
-      object-fit: cover;
-      opacity: .92;
-    }
-    @media (max-width: 560px){
-      .hero img{ height: 130px; }
+      background:
+        radial-gradient(500px 260px at 15% 30%, rgba(99,102,241,.35), transparent 60%),
+        radial-gradient(460px 260px at 85% 30%, rgba(34,211,238,.22), transparent 60%),
+        linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      box-shadow: 0 28px 70px rgba(0,0,0,.35);
     }
 
-    /* Pills: wrap nicely on mobile */
+    .heroGlow{
+      position: absolute;
+      inset: -40px;
+      background:
+        radial-gradient(260px 260px at 22% 50%, rgba(255,255,255,.10), transparent 60%),
+        radial-gradient(330px 280px at 88% 20%, rgba(255,255,255,.08), transparent 65%);
+      pointer-events: none;
+    }
+
+    .heroContent{
+      position: relative;
+      padding: 34px 26px;
+    }
+
+    .heroTitle{
+      margin: 0 0 10px;
+      font-size: 44px;
+      font-weight: 1000;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      text-shadow: 0 18px 35px rgba(0,0,0,.40);
+    }
+
+    .heroSubtitle{
+      margin: 0;
+      font-size: 18px;
+      color: rgba(255,255,255,.74);
+      line-height: 1.35;
+    }
+
+    /* Pills */
     .pillRow{
       display:flex;
       flex-wrap:wrap;
@@ -117,7 +180,7 @@
       line-height: 1.35;
     }
 
-    /* ---------- NEW: Food image row (left card) ---------- */
+    /* Food image row */
     .foodMediaRow{
       display:flex;
       gap:12px;
@@ -143,9 +206,7 @@
       object-fit: cover;
       display:block;
     }
-    .foodMeta{
-      min-width: 0;
-    }
+    .foodMeta{ min-width: 0; }
     .foodTitle{
       margin:0;
       font-weight: 950;
@@ -201,7 +262,7 @@
       margin: 0;
     }
 
-    /* ---------- NEW: optional image inside result urgency card ---------- */
+    /* Optional image inside urgency card */
     .urgencyMedia{
       position:absolute;
       top: 10px;
@@ -269,8 +330,16 @@
     }
 
     @media (max-width: 560px){
-      .wrap{ padding: 18px 12px 26px; }
-      h1{ font-size: 24px; }
+      .wrap{ padding: 14px 12px 26px; }
+
+      .siteLogo{ width: 56px; }
+      .topbarSpacer{ width: 56px; }
+      .siteTitle{ font-size: 20px; }
+
+      .heroContent{ padding: 22px 16px; }
+      .heroTitle{ font-size: 30px; }
+      .heroSubtitle{ font-size: 14.5px; }
+
       .card{ padding: 14px; border-radius: 14px; }
       .row{ grid-template-columns: 1fr; }
       .btnRow{ flex-direction:column; }
@@ -292,13 +361,24 @@
 </head>
 
 <body>
-  <div class="wrap">
-    <h1>Vlerësuesi i Freskisë së Ushqimit</h1>
-
-    <!-- NEW: Hero picture -->
-    <div class="hero">
-      <img id="heroImg" alt="Ushqime të freskëta" />
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="topbarInner">
+      <img class="siteLogo" src="Logo.png" alt="Logo - Vlerësuesi i Freskisë së Ushqimit" />
+      <h1 class="siteTitle">Vlerësuesi i Freskisë së Ushqimit</h1>
+      <div class="topbarSpacer" aria-hidden="true"></div>
     </div>
+  </header>
+
+  <div class="wrap">
+    <!-- Hero card -->
+    <section class="heroCard">
+      <div class="heroGlow" aria-hidden="true"></div>
+      <div class="heroContent">
+        <h2 class="heroTitle">Freskia fillon me ruajtjen</h2>
+        <p class="heroSubtitle">Kontrollo datat • Ruaj ftohtë • Mos rreziko kur dyshon</p>
+      </div>
+    </section>
 
     <p class="sub">
       Vlerësime të kujdesshme dhe konservative. Nëse produkti ka datë “përdoret deri / më e mira para”, ndiqni atë.
@@ -321,7 +401,6 @@
         <label for="food">Ushqimi</label>
         <select id="food"></select>
 
-        <!-- NEW: Food thumbnail + meta -->
         <div class="foodMediaRow" aria-live="polite">
           <div class="foodThumb">
             <img id="foodImg" alt="Foto e ushqimit" />
@@ -395,7 +474,6 @@
 
         <div class="resultStack">
           <div id="urgencyCard" class="bigBox">
-            <!-- NEW: tiny picture on the card -->
             <div class="urgencyMedia" aria-hidden="true">
               <img id="urgencyImg" alt="" />
             </div>
@@ -441,28 +519,8 @@
   </div>
 
   <script>
-    /* ---------- NEW: tiny inline images (no hosting needed) ---------- */
+    /* Icons */
     const IMG = {
-      hero: svgDataUrl(`
-        <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420">
-          <defs>
-            <linearGradient id="g" x1="0" x2="1">
-              <stop offset="0" stop-color="#6366f1" stop-opacity="0.55"/>
-              <stop offset="1" stop-color="#22d3ee" stop-opacity="0.35"/>
-            </linearGradient>
-          </defs>
-          <rect width="1200" height="420" fill="#0b1020"/>
-          <rect width="1200" height="420" fill="url(#g)"/>
-          <circle cx="220" cy="220" r="140" fill="rgba(255,255,255,0.12)"/>
-          <circle cx="1020" cy="120" r="180" fill="rgba(255,255,255,0.08)"/>
-          <text x="60" y="250" fill="rgba(255,255,255,0.92)" font-family="system-ui,Segoe UI,Arial" font-size="54" font-weight="800">
-            Freskia fillon me ruajtjen
-          </text>
-          <text x="60" y="305" fill="rgba(255,255,255,0.72)" font-family="system-ui,Segoe UI,Arial" font-size="26">
-            Kontrollo datat • Ruaj ftohtë • Mos rreziko kur dyshon
-          </text>
-        </svg>
-      `),
       fallback: coloredTile("?", "#ffffff"),
       milk: iconMilk(),
       feta_cheese: iconCheese(),
@@ -498,7 +556,6 @@
       `);
     }
 
-    /* Simple icon set */
     function iconMilk(){ return coloredTile("🥛", "#ffffff"); }
     function iconCheese(){ return coloredTile("🧀", "#ffffff"); }
     function iconEggs(){ return coloredTile("🥚", "#ffffff"); }
@@ -511,7 +568,6 @@
     function iconBread(){ return coloredTile("🍞", "#ffffff"); }
     function iconTomato(){ return coloredTile("🍅", "#ffffff"); }
 
-    /* ---------- Your existing DB ---------- */
     const DB = [
       { cat:"Bulmet", id:"milk", name:"Qumësht", highRisk:false,
         rules:{ fridge:{ sealed:[7,10], opened:[5,7] }, freezer:{ sealed:[90,180], opened:[90,180] }, pantry:{ sealed:[0,0], opened:[0,0] } },
@@ -804,7 +860,6 @@
       };
     }
 
-    /* ---------- NEW: update pictures when food changes ---------- */
     function updateFoodMedia(){
       const foodId = $("food").value;
       const item = DB.find(x => x.id === foodId);
@@ -815,8 +870,6 @@
 
       $("foodTitle").textContent = item ? item.name : "—";
       $("foodCat").textContent = item ? item.cat : "—";
-
-      // Better alt text for accessibility
       $("foodImg").alt = item ? `Foto/ikonë për: ${item.name}` : "Foto e ushqimit";
     }
 
@@ -846,9 +899,6 @@
     }
 
     function init(){
-      // set hero image once
-      $("heroImg").src = IMG.hero;
-
       resetUI();
 
       $("storage").addEventListener("change", (e) => autoFillTempForStorage(e.target.value));
